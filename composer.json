@@ -1,0 +1,21 @@
+{
+    "name": "pkracer/json-api-documents",
+    "description": "Create api responses that adhere to the JSON API specification",
+    "autoload": {
+        "psr-4": {
+            "Pkracer\\": "src/Pkracer"
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^2.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pat Kane",
+            "email": "pk225104@gmail.com"
+        }
+    ]
+}
