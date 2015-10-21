@@ -2,7 +2,9 @@
 
 namespace Pkracer\JsonApiDocuments;
 
-class JsonApiError
+use Pkracer\JsonApiDocuments\Interfaces\ErrorInterface;
+
+class Error implements ErrorInterface
 {
     protected $id;
 

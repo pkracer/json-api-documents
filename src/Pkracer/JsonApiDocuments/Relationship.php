@@ -3,8 +3,10 @@
 namespace Pkracer\JsonApiDocuments;
 
 use Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentResourceException;
+use Pkracer\JsonApiDocuments\Interfaces\RelationshipInterface;
+use Pkracer\JsonApiDocuments\Interfaces\ResourceInterface;
 
-class JsonApiRelationship
+class Relationship implements RelationshipInterface
 {
     protected $name;
 
@@ -26,6 +28,12 @@ class JsonApiRelationship
         $this->meta = $meta;
     }
 
+    public function name($name)
+    {
+        $this->name = (string) $name;
+        return $this;
+    }
+
     public function getName()
     {
         return $this->name;
@@ -36,13 +44,22 @@ class JsonApiRelationship
         return $this->data;
     }
 
+    public function data($data)
+    {
+        if ($this->dataIsValid($data)) {
+            $this->data = $data;
+        }
+
+        return $this;
+    }
+
     protected function dataIsValid($data)
     {
         if (is_null($data)) {
             return true;
         }
 
-        if ($data instanceof JsonApiResource) {
+        if ($data instanceof ResourceInterface) {
             return true;
         }
 
@@ -52,7 +69,7 @@ class JsonApiRelationship
 
         if (is_array($data)) {
             foreach ($data as $resource) {
-                if ( ! $resource instanceof JsonApiResource) {
+                if ( ! $resource instanceof ResourceInterface) {
                     throw new InvalidDocumentResourceException;
                 }
             }
@@ -102,7 +119,7 @@ class JsonApiRelationship
         }
 
         // if there is a has one relationship but and attributes are set
-        if ($this->data instanceof JsonApiResource && ! empty($this->data->getAttributes())) {
+        if ($this->data instanceof Resource && ! empty($this->data->getAttributes())) {
             return true;
         }
 
@@ -110,7 +127,7 @@ class JsonApiRelationship
         if (is_array($this->data)) {
 
             foreach ($this->data as $resource) {
-                /** @var $resource JsonApiResource */
+                /** @var $resource Resource */
                 if (! empty($resource->getAttributes())) {
                     return true;
                 }
@@ -126,18 +143,18 @@ class JsonApiRelationship
             return [];
         }
 
-        if ($this->data instanceof JsonApiResource && empty($this->data->getAttributes())) {
+        if ($this->data instanceof Resource && empty($this->data->getAttributes())) {
             return [];
         }
 
-        if ($this->data instanceof JsonApiResource && ! empty($this->data->getAttributes())) {
+        if ($this->data instanceof Resource && ! empty($this->data->getAttributes())) {
             return [$this->data];
         }
 
         $includes = [];
         if (is_array($this->data)) {
             foreach ($this->data as $resource) {
-                /** @var $resource JsonApiResource */
+                /** @var $resource Resource */
                 if ($resource->getAttributes()) {
                     $includes[] = $resource;
                 }
@@ -145,6 +162,38 @@ class JsonApiRelationship
         }
 
         return $includes;
+    }
+
+    public function toArray()
+    {
+        $relationship = [];
+
+        if ( ! empty($this->data) || ! is_null($this->data)) {
+            if ($this->data instanceof ResourceInterface) {
+                $relationship['data']['type'] = $this->data->getType();
+                $relationship['data']['id'] = $this->data->getId();
+            }
+
+            if (is_array($this->data)) {
+                $relationship['data'] = [];
+                foreach ($this->data as $index => $resource) {
+                    $relationship['data'][$index]['type'] = $resource->getType();
+                    $relationship['data'][$index]['id'] = $resource->getId();
+                }
+
+            }
+        }
+
+
+        if ( ! empty($this->links)) {
+            $relationship['links'] = $this->links;
+        }
+
+        if ( ! empty($this->meta)) {
+            $relationship['meta'] = $this->meta;
+        }
+
+        return [$this->name => $relationship];
     }
 
 }

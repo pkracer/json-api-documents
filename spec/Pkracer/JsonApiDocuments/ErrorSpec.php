@@ -5,11 +5,11 @@ namespace spec\Pkracer\JsonApiDocuments;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class JsonApiErrorSpec extends ObjectBehavior
+class ErrorSpec extends ObjectBehavior
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType('Pkracer\JsonApiDocuments\JsonApiError');
+        $this->shouldHaveType(\Pkracer\JsonApiDocuments\Interfaces\ErrorInterface::class);
     }
 
     function it_may_contain_an_id()

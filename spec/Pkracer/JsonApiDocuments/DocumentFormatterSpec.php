@@ -5,11 +5,11 @@ namespace spec\Pkracer\JsonApiDocuments;
 use PhpSpec\ObjectBehavior;;
 use Prophecy\Argument;
 
-class JsonApiResourceFormatSpec extends ObjectBehavior
+class DocumentFormatterSpec extends ObjectBehavior
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType('Pkracer\JsonApiDocuments\JsonApiResourceFormat');
+        $this->shouldHaveType(\Pkracer\JsonApiDocuments\Interfaces\DocumentFormatterInterface::class);
     }
 
     public function it_returns_the_resource_type()

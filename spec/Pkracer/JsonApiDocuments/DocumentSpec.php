@@ -3,36 +3,34 @@
 namespace spec\Pkracer\JsonApiDocuments;
 
 use PhpSpec\ObjectBehavior;
-use Pkracer\JsonApiDocuments\JsonApiDocumentFormat;
-use Pkracer\JsonApiDocuments\JsonApiDocumentFormatInterface;
-use Pkracer\JsonApiDocuments\JsonApiResource;
-use Pkracer\JsonApiDocuments\JsonApiResourceFormat;
+use Pkracer\JsonApiDocuments\DocumentFormatter;
+use Pkracer\JsonApiDocuments\Resource;
 use Prophecy\Argument;
 
-class JsonApiDocumentSpec extends ObjectBehavior
+class DocumentSpec extends ObjectBehavior
 {
-    function let(JsonApiResourceFormat $format)
+    function let(DocumentFormatter $format)
     {
         $this->beConstructedWith($format);
     }
 
     function it_is_initializable()
     {
-        $this->shouldHaveType(\Pkracer\JsonApiDocuments\JsonApiDocument::class);
+        $this->shouldHaveType(\Pkracer\JsonApiDocuments\Document::class);
     }
 
     function it_accepts_a_json_api_resource_as_data()
     {
-        $resource = new JsonApiResource('resource', '1', ['attribute' => 'value']);
-        $this->item($resource)->shouldReturn($this);
+        $resource = new Resource('resource', '1', ['attribute' => 'value']);
+        $this->data($resource)->shouldReturn($this);
         $this->getData()->shouldReturn($resource);
     }
 
     function it_accepts_an_array_of_json_api_resources_as_data()
     {
-        $resource1 = new JsonApiResource('resource', '1', ['attribute' => 'value']);
-        $resource2 = new JsonApiResource('resource', '2', ['attribute' => 'value']);
-        $this->collection([$resource1, $resource2])->shouldReturn($this);
+        $resource1 = new Resource('resource', '1', ['attribute' => 'value']);
+        $resource2 = new Resource('resource', '2', ['attribute' => 'value']);
+        $this->data([$resource1, $resource2])->shouldReturn($this);
         $this->getData()->shouldReturn([$resource1, $resource2]);
     }
 
@@ -65,40 +63,40 @@ class JsonApiDocumentSpec extends ObjectBehavior
         ]);
     }
 
-    function it_can_include_additional_resources()
-    {
-        $this->sideload([])->shouldReturn($this);
-        $this->getIncludes()->shouldReturn([[]]);
-    }
+//    function it_can_include_additional_resources()
+//    {
+//        $this->sideload([])->shouldReturn($this);
+//        $this->getIncludes()->shouldReturn([[]]);
+//    }
 
     function it_does_not_allow_the_data_and_error_members_to_exist_at_the_same_time()
     {
-        $resource = new JsonApiResource('resource', '1', ['attribute' => 'value']);
+        $resource = new Resource('resource', '1', ['attribute' => 'value']);
 
-        $this->item($resource);
+        $this->data($resource);
         $this->errors([]);
         $this->getData()->shouldReturn(null);
-        $this->item($resource);
+        $this->data($resource);
         $this->getErrors()->shouldReturn([]);
     }
 
     function it_accepts_a_data_format_object()
     {
-        $format = new JsonApiResourceFormat();
+        $format = new DocumentFormatter();
         $this->format($format)->shouldReturn($this);
         $this->getFormat()->shouldReturn($format);
     }
 
     function it_converts_a_data_format_string_to_an_object()
     {
-        $format = JsonApiResourceFormat::class;
+        $format = DocumentFormatter::class;
         $this->format($format)->shouldReturn($this);
         $this->getFormat()->shouldBeAnInstanceOf($format);
     }
 
     function it_can_be_constructed_with_a_format_string()
     {
-        $format = JsonApiResourceFormat::class;
+        $format = DocumentFormatter::class;
         $this->beConstructedWith($format);
         $this->getFormat()->shouldBeAnInstanceOf($format);
     }

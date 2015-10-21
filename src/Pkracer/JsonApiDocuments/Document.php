@@ -9,8 +9,12 @@ use Pkracer\JsonApiDocuments\Exceptions\InvalidLinkException;
 use Pkracer\JsonApiDocuments\Exceptions\MissingFormatException;
 use Pkracer\JsonApiDocuments\Exceptions\MissingIdException;
 use Pkracer\JsonApiDocuments\Exceptions\MissingTypeException;
+use Pkracer\JsonApiDocuments\Interfaces\DocumentFormatterInterface;
+use Pkracer\JsonApiDocuments\Interfaces\DocumentInterface;
+use Pkracer\JsonApiDocuments\Interfaces\ErrorInterface;
+use Pkracer\JsonApiDocuments\Interfaces\ResourceInterface;
 
-class JsonApiDocument
+class Document implements DocumentInterface
 {
     protected $data;
 
@@ -22,10 +26,10 @@ class JsonApiDocument
 
     protected $description = [];
 
-    protected $includes = [];
+    protected $included = [];
 
     /**
-     * @var \Pkracer\JsonApiDocuments\JsonApiDocumentFormatInterface
+     * @var DocumentFormatterInterface
      */
     protected $format;
 
@@ -36,16 +40,25 @@ class JsonApiDocument
         }
     }
 
-    public function item(JsonApiResource $resource)
+    public function data($data)
     {
-        if ( ! $resource instanceof JsonApiResource) {
-            throw new InvalidDocumentResourceException;
+        // clear any errors if data is being set
+        $this->errors = [];
+
+        if ($data instanceof ResourceInterface) {
+            $this->data = $data;
+            return $this;
         }
 
-        $this->data = $resource;
+        if (is_array($data)) {
+            foreach ($data as $resource) {
+                if ( ! $resource instanceof ResourceInterface) {
+                    throw new InvalidDocumentResourceException;
+                }
+            }
+        }
 
-        // clear errors if data is being set
-        $this->errors = [];
+        $this->data = $data;
         return $this;
     }
 
@@ -57,7 +70,7 @@ class JsonApiDocument
     public function errors(array $errors)
     {
         foreach ($errors as $error) {
-            if ( ! $error instanceof JsonApiError) {
+            if ( ! $error instanceof ErrorInterface) {
                 throw new InvalidErrorFormatException;
             }
         }
@@ -93,7 +106,7 @@ class JsonApiDocument
         return $this->description;
     }
 
-    public function links(array $links = [])
+    public function links(array $links)
     {
         $this->links = $links;
         return $this;
@@ -104,15 +117,21 @@ class JsonApiDocument
         return $this->links;
     }
 
-    public function sideload(array $resource)
+    public function includes(ResourceInterface $resource)
     {
-        $this->includes[] = $resource;
+        $this->included[] = $resource;
         return $this;
     }
 
-    public function getIncludes()
+    public function included(array $included)
     {
-        return $this->includes;
+        $this->included[] = $included;
+        return $this;
+    }
+
+    public function getIncluded()
+    {
+        return $this->included;
     }
 
     public function format($format)
@@ -121,7 +140,7 @@ class JsonApiDocument
             $format = new $format;
         }
 
-        if ( ! $format instanceof JsonApiDocumentFormatInterface) {
+        if ( ! $format instanceof DocumentFormatterInterface) {
             throw new InvalidDocumentFormatException;
         }
 
@@ -149,8 +168,13 @@ class JsonApiDocument
 
     protected function errorDocumentToArray()
     {
+        $errors = [];
+
+        foreach ($this->errors as $error) {
+            $errors[] = $error->toArray();
+        }
         return [
-            'errors' => $this->errors
+            'errors' => $errors
         ];
     }
 
@@ -177,17 +201,5 @@ class JsonApiDocument
         }
 
         return $document;
-    }
-
-    public function collection(array $resources)
-    {
-        foreach ($resources as $resource) {
-            if ( ! $resource instanceof JsonApiResource) {
-                throw new InvalidDocumentResourceException;
-            }
-        }
-
-        $this->data = $resources;
-        return $this;
     }
 }

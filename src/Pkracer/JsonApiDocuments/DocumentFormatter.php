@@ -4,8 +4,9 @@ namespace Pkracer\JsonApiDocuments;
 
 use Pkracer\JsonApiDocuments\Exceptions\MissingIdException;
 use Pkracer\JsonApiDocuments\Exceptions\MissingTypeException;
+use Pkracer\JsonApiDocuments\Interfaces\DocumentFormatterInterface;
 
-class JsonApiResourceFormat implements JsonApiDocumentFormatInterface
+class DocumentFormatter implements DocumentFormatterInterface
 {
     protected $type = 'defaults';
 
