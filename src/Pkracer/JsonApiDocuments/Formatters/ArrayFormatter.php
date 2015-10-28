@@ -4,8 +4,6 @@ namespace Pkracer\JsonApiDocuments\Formatters;
 
 use Pkracer\JsonApiDocuments\Exceptions\MissingIdException;
 use Pkracer\JsonApiDocuments\Exceptions\MissingTypeException;
-use Pkracer\JsonApiDocuments\Relationship;
-use Pkracer\JsonApiDocuments\Resource;
 
 class ArrayFormatter extends FormatterAbstract
 {
@@ -15,18 +13,8 @@ class ArrayFormatter extends FormatterAbstract
             throw new \InvalidArgumentException('The resource must be an array.');
         }
 
-        if (is_null($this->type)) {
-            throw new \InvalidArgumentException('The type must be set on the formatter.');
-        }
-
-        $resource = $this->instantiateResource($array);
-
-        return $this->setOptionalTopLevelMembers($resource, $array);
+        return parent::format($array);
     }
-
-
-
-
 
     protected function canBeIncluded($resource)
     {
