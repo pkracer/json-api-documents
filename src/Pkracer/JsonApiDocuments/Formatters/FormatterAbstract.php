@@ -160,6 +160,22 @@ abstract class FormatterAbstract implements FormatterInterface
         return $resource;
     }
 
+    protected function hasOne($entity, FormatterInterface $formatter)
+    {
+        return $formatter->format($entity);
+    }
+
+    protected function hasMany($entity, FormatterInterface $formatter)
+    {
+        $formattedRelations = [];
+
+        foreach ($entity as $item) {
+            $formattedRelations[] = $formatter->format($item);
+        }
+
+        return $formattedRelations;
+    }
+
     protected function setRelationships(Resource $resource, $entity)
     {
         if ( ! empty($this->relationships)) {
