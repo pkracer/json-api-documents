@@ -2,6 +2,7 @@
 
 namespace Pkracer\JsonApiDocuments\Formatters;
 
+use Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentFormatException;
 use Pkracer\JsonApiDocuments\Interfaces\FormatterInterface;
 use Pkracer\JsonApiDocuments\Relationship;
 use Pkracer\JsonApiDocuments\Resource;
@@ -160,13 +161,17 @@ abstract class FormatterAbstract implements FormatterInterface
         return $resource;
     }
 
-    protected function hasOne($entity, FormatterInterface $formatter)
+    protected function hasOne($entity, $formatter)
     {
+        $formatter = $this->initializeFormatter($formatter);
+
         return $formatter->format($entity);
     }
 
-    protected function hasMany($entity, FormatterInterface $formatter)
+    protected function hasMany($entity, $formatter)
     {
+        $formatter = $this->initializeFormatter($formatter);
+
         $formattedRelations = [];
 
         foreach ($entity as $item) {
@@ -174,6 +179,24 @@ abstract class FormatterAbstract implements FormatterInterface
         }
 
         return $formattedRelations;
+    }
+
+    /**
+     * @param $formatter
+     * @return FormatterInterface
+     * @throws InvalidDocumentFormatException
+     */
+    public function initializeFormatter($formatter)
+    {
+        if (is_string($formatter) && class_exists($formatter)) {
+            $formatter = new $formatter;
+        }
+
+        if ( ! $formatter instanceof FormatterInterface) {
+            throw new InvalidDocumentFormatException;
+        }
+
+        return $formatter;
     }
 
     protected function setRelationships(Resource $resource, $entity)
