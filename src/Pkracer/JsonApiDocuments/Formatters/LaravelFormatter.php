@@ -4,7 +4,6 @@ namespace Pkracer\JsonApiDocuments\Formatters;
 
 use Illuminate\Database\Eloquent\Collection as Collection;
 use Illuminate\Database\Eloquent\Model;
-use Pkracer\JsonApiDocuments\DocumentFormatter;
 
 class LaravelFormatter extends ArrayFormatter
 {

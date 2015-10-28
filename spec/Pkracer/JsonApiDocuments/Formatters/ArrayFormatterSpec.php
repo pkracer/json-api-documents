@@ -69,9 +69,9 @@ class ArrayFormatterSpec extends ObjectBehavior
 
     function it_allows_the_default_links_to_be_overridden()
     {
-        $this->defaultLinksAreOverriden()->shouldReturn(false);
+        $this->defaultLinksAreOverridden()->shouldReturn(false);
         $this->overrideLinks(true)->shouldReturn($this);
-        $this->defaultLinksAreOverriden()->shouldReturn(true);
+        $this->defaultLinksAreOverridden()->shouldReturn(true);
     }
 
     function it_returns_the_relationships()

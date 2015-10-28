@@ -19,58 +19,14 @@ class ArrayFormatter extends FormatterAbstract
             throw new \InvalidArgumentException('The type must be set on the formatter.');
         }
 
-        $resource = new Resource($this->type, $this->formatId($array));
+        $resource = $this->instantiateResource($array);
 
         return $this->setOptionalTopLevelMembers($resource, $array);
     }
 
-    public function setOptionalTopLevelMembers(Resource $resource, array $array)
-    {
-        if (method_exists($this, 'attributes')) {
-            $resource->attributes($this->attributes($array));
-        }
 
-        if (method_exists($this, 'links')) {
-            $resource->links($this->links($array));
-        }
 
-        if (method_exists($this, 'meta')) {
-            $resource->meta($this->meta($array));
-        }
 
-        if ( ! empty($this->relationships)) {
-            $relationships = $this->buildRelationships($array);
-            $resource->relationships($relationships);
-
-            // TODO: need to fix this into a loop
-            // TODO: add optional second argument to the $resource->relationships() method that determins if incoming sjould be sideloaded
-//            if ($this->canBeIncluded($relationships)) {
-//                /* @var $relationships Relationship */
-//                $nestedResources = $relationships->getResourcesToInclude();
-//
-//                // TODO:: allow included to be set all at once rather than through iteration
-//                foreach ($nestedResources as $nestedResource) {
-//                    $resource->includes($nestedResource);
-//                }
-//            }
-        }
-
-        return $resource;
-    }
-
-    protected function buildRelationships(array $item)
-    {
-        $relationships = [];
-
-        foreach ($this->relationships as $relationship) {
-
-            if ($this->relationshipCanBeLoaded($relationship, $item)) {
-                $relationships[] = $this->buildRelationship($relationship, $item);
-            }
-        }
-
-        return $relationships;
-    }
 
     protected function canBeIncluded($resource)
     {
@@ -81,53 +37,6 @@ class ArrayFormatter extends FormatterAbstract
         return false;
     }
 
-    protected function relationshipCanBeLoaded($relationship, array $resource)
-    {
-        return method_exists($this, $relationship) && isset($resource[$relationship]);
-    }
-
-    protected function buildRelationship($name, array $item)
-    {
-        $formattedRelationshipResources = $this->formatRelationshipItems($name, $item);
-
-        $relation = new Relationship($name, $formattedRelationshipResources);
-
-        $linksMethod = $this->relationshipLinksMethod($name);
-
-        if (method_exists($this, $linksMethod)) {
-            $relation->links($this->$linksMethod($item));
-        }
-
-        $metaMethod = $this->relationshipMetaMethod($name);
-        if (method_exists($this, $metaMethod)) {
-            $relation->meta($this->$metaMethod($item));
-        }
-
-        return $relation;
-    }
-
-    protected function formatRelationshipItems($relationship, $resource)
-    {
-        return $this->$relationship($resource);
-    }
-
-    protected function relationshipLinksMethod($relationship)
-    {
-        return $relationship . 'Links';
-    }
-
-    protected function relationshipMetaMethod($relationship)
-    {
-        return $relationship . 'Meta';
-    }
-
-    public function relationLinks(array $item)
-    {
-        return [
-            'self' => $this->baseUrl . '/' . $this->type . '/' . $item['id'] . '/relationships/relation',
-            'related' => $this->baseUrl . '/' . $this->type . '/' . $item['id'] . '/relation',
-        ];
-    }
 
     public function hasRelationsToFormat(array $item)
     {
