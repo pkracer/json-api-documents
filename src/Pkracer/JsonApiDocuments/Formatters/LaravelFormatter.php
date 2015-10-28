@@ -5,7 +5,7 @@ namespace Pkracer\JsonApiDocuments\Formatters;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class LaravelFormatter extends ArrayFormatter
+class LaravelFormatter extends FormatterAbstract
 {
     public function format($entity)
     {

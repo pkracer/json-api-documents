@@ -8,11 +8,6 @@ use Pkracer\JsonApiDocuments\Resource;
 
 abstract class FormatterAbstract implements FormatterInterface
 {
-    /**
-     * @var \Pkracer\JsonApiDocuments\Resource
-     */
-    protected $resource;
-
     protected $type;
 
     protected $id = 'id';
@@ -141,7 +136,7 @@ abstract class FormatterAbstract implements FormatterInterface
     protected function setAttributes(Resource $resource, $entity)
     {
         if (method_exists($this, 'attributes')) {
-            $this->resource->attributes($this->attributes($entity));
+            $resource->attributes($this->attributes($entity));
         }
 
         return $resource;
@@ -150,7 +145,7 @@ abstract class FormatterAbstract implements FormatterInterface
     protected function setLinks(Resource $resource, $entity)
     {
         if (method_exists($this, 'links')) {
-            $this->resource->links($this->links($entity));
+            $resource->links($this->links($entity));
         }
 
         return $resource;
@@ -159,7 +154,7 @@ abstract class FormatterAbstract implements FormatterInterface
     protected function setMeta(Resource $resource, $entity)
     {
         if (method_exists($this, 'meta')) {
-            $this->resource->meta($this->meta($entity));
+            $resource->meta($this->meta($entity));
         }
 
         return $resource;
@@ -169,7 +164,7 @@ abstract class FormatterAbstract implements FormatterInterface
     {
         if ( ! empty($this->relationships)) {
             $relationships = $this->buildRelationships($entity);
-            $this->resource->relationships($relationships);
+            $resource->relationships($relationships);
 
             // TODO: need to fix this into a loop
             // TODO: add optional second argument to the $resource->relationships() method that determins if incoming sjould be sideloaded
