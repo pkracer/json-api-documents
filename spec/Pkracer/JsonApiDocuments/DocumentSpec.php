@@ -3,17 +3,12 @@
 namespace spec\Pkracer\JsonApiDocuments;
 
 use PhpSpec\ObjectBehavior;
-use Pkracer\JsonApiDocuments\DocumentFormatter;
+use Pkracer\JsonApiDocuments\ArrayFormatter;
 use Pkracer\JsonApiDocuments\Resource;
 use Prophecy\Argument;
 
 class DocumentSpec extends ObjectBehavior
 {
-    function let(DocumentFormatter $format)
-    {
-        $this->beConstructedWith($format);
-    }
-
     function it_is_initializable()
     {
         $this->shouldHaveType(\Pkracer\JsonApiDocuments\Document::class);
@@ -80,37 +75,31 @@ class DocumentSpec extends ObjectBehavior
         $this->getErrors()->shouldReturn([]);
     }
 
-    function it_accepts_a_data_format_object()
-    {
-        $format = new DocumentFormatter();
-        $this->format($format)->shouldReturn($this);
-        $this->getFormat()->shouldReturn($format);
-    }
-
-    function it_converts_a_data_format_string_to_an_object()
-    {
-        $format = DocumentFormatter::class;
-        $this->format($format)->shouldReturn($this);
-        $this->getFormat()->shouldBeAnInstanceOf($format);
-    }
-
-    function it_can_be_constructed_with_a_format_string()
-    {
-        $format = DocumentFormatter::class;
-        $this->beConstructedWith($format);
-        $this->getFormat()->shouldBeAnInstanceOf($format);
-    }
-
-    function its_format_must_be_valid()
-    {
-        $this->shouldThrow(\Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentFormatException::class)->duringFormat('format');
-    }
-
-    function it_throws_an_exception_when_format_is_missing()
-    {
-        $this->beConstructedWith(null);
-        $this->shouldThrow(\Pkracer\JsonApiDocuments\Exceptions\MissingFormatException::class)->duringToArray();
-    }
+//    function it_accepts_a_data_formatter_object()
+//    {
+//        $formatter = new ArrayFormatter();
+//        $this->formatter($formatter)->shouldReturn($this);
+//        $this->getFormatter()->shouldReturn($formatter);
+//    }
+//
+//    function it_converts_a_data_format_string_to_an_object()
+//    {
+//        $formatter = ArrayFormatter::class;
+//        $this->formatter($formatter)->shouldReturn($this);
+//        $this->getFormatter()->shouldBeAnInstanceOf($formatter);
+//    }
+//
+//    function it_can_be_constructed_with_a_format_string()
+//    {
+//        $formatter = ArrayFormatter::class;
+//        $this->beConstructedWith($formatter);
+//        $this->getFormatter()->shouldBeAnInstanceOf($formatter);
+//    }
+//
+//    function its_formatter_must_be_valid()
+//    {
+//        $this->shouldThrow(\Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentFormatException::class)->duringFormatter('formatter');
+//    }
 
     function it_fetches_links()
     {

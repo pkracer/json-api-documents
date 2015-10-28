@@ -100,7 +100,25 @@ class RelationshipSpec extends ObjectBehavior
     {
         $resource1 = new Resource('relation', 1);
         $resource2 = new Resource('relation', 2);
-        $this->beConstructedWith('relationship', [$resource1, $resource2], ['self' => 'default/1/relationships/relation'], ['count'=> 100]);
+        $this->beConstructedWith(
+            // relationship name
+            'relationship',
+
+            // json api resources
+            [
+                $resource1,
+                $resource2
+            ],
+
+            // links
+            [
+                'self' => 'default/1/relationships/relation'
+            ],
+
+            // meta
+            [
+                'count'=> 100
+            ]);
 
         $this->toArray()->shouldReturn([
             'relationship' => [

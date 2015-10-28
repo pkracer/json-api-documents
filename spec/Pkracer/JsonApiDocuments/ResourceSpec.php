@@ -22,27 +22,27 @@ class ResourceSpec extends ObjectBehavior
         $this->shouldHaveType(\Pkracer\JsonApiDocuments\Interfaces\ResourceInterface::class);
     }
 
-    public function it_can_override_the_constructed_resource_type()
+    function it_can_override_the_constructed_resource_type()
     {
         $this->type('test')->shouldReturn($this);
     }
 
-    public function it_can_fetch_the_resource_type()
+    function it_can_fetch_the_resource_type()
     {
         $this->getType()->shouldReturn('default');
     }
 
-    public function it_can_override_the_constructed_resource_id()
+    function it_can_override_the_constructed_resource_id()
     {
         $this->id(1000)->shouldReturn($this);
     }
 
-    public function it_can_fetch_the_resource_id()
+    function it_can_fetch_the_resource_id()
     {
         $this->getId()->shouldReturn('1');
     }
 
-    public function it_can_set_attributes_on_the_resource()
+    function it_can_set_attributes_on_the_resource()
     {
         $this->attributes([
             'name' => 'new name',
@@ -50,7 +50,7 @@ class ResourceSpec extends ObjectBehavior
         ])->shouldReturn($this);
     }
 
-    public function it_can_fetch_the_attributes_of_the_resource()
+    function it_can_fetch_the_attributes_of_the_resource()
     {
         $this->attributes([
             'name' => 'new name',
@@ -63,14 +63,14 @@ class ResourceSpec extends ObjectBehavior
         ]);
     }
 
-    public function it_can_set_links_on_the_resource()
+    function it_can_set_links_on_the_resource()
     {
         $this->links([
             'self' => '/resource/1',
         ])->shouldReturn($this);
     }
 
-    public function it_can_fetch_the_links_set_on_the_resource()
+    function it_can_fetch_the_links_set_on_the_resource()
     {
         $this->links([
             'self' => '/resource/1',
@@ -81,7 +81,7 @@ class ResourceSpec extends ObjectBehavior
         ]);
     }
 
-    public function it_can_set_meta_information_on_the_resource()
+    function it_can_set_meta_information_on_the_resource()
     {
         $this->meta([
             'count' => 1,
@@ -89,7 +89,7 @@ class ResourceSpec extends ObjectBehavior
         ])->shouldReturn($this);
     }
 
-    public function it_can_fetch_the_meta_information_set_on_the_resource()
+    function it_can_fetch_the_meta_information_set_on_the_resource()
     {
         $this->meta([
             'count' => 1,
@@ -102,14 +102,14 @@ class ResourceSpec extends ObjectBehavior
         ]);
     }
 
-    public function it_accepts_a_single_relationship()
+    function it_accepts_a_single_relationship()
     {
         $resource = new Resource('object', '100', ['property' => 'value']);
         $relationship = new Relationship('relationship', $resource);
         $this->relationship($relationship)->shouldReturn($this);
     }
 
-    public function it_accepts_an_array_of_relationships()
+    function it_accepts_an_array_of_relationships()
     {
         $resource1 = new Resource('object', '100', ['property' => 'value']);
         $relationship1 = new Relationship('relationship', $resource1);
@@ -118,7 +118,7 @@ class ResourceSpec extends ObjectBehavior
         $this->relationships([$relationship1, $relationship2])->shouldReturn($this);
     }
 
-    public function it_can_fetch_a_specific_relation_on_the_resource()
+    function it_can_fetch_a_specific_relation_on_the_resource()
     {
         $resource1 = new Resource('object', '100', ['property' => 'value']);
         $relationship1 = new Relationship('relationship', $resource1);
@@ -143,8 +143,28 @@ class ResourceSpec extends ObjectBehavior
 
     }
 
+    function it_can_have_another_resource_set_to_be_included()
+    {
+        $resource = new Resource('object', '100', ['property' => 'value']);
+        $this->includes($resource)->shouldReturn($this);
+    }
 
-    public function it_can_be_converted_to_an_array()
+    function it_can_fetch_included_resources()
+    {
+        $resource = new Resource('object', '100', ['property' => 'value']);
+        $this->includes($resource);
+        $this->getIncludes()->shouldReturn([$resource]);
+    }
+
+    function it_can_have_an_array_of_resources_set_to_be_included()
+    {
+        $resource1 = new Resource('object', '100', ['property' => 'value']);
+        $resource2 = new Resource('object', '101', ['property' => 'value']);
+        $this->includes([$resource1, $resource2])->shouldReturn($this);
+        $this->getIncludes()->shouldReturn([$resource1, $resource2]);
+    }
+
+    function it_can_be_converted_to_an_array()
     {
         $this->links(['self' => '/defaults/1']);
         $this->meta([

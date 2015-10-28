@@ -2,6 +2,7 @@
 
 namespace Pkracer\JsonApiDocuments;
 
+use Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentResourceException;
 use Pkracer\JsonApiDocuments\Exceptions\InvalidRelationshipException;
 use Pkracer\JsonApiDocuments\Interfaces\RelationshipInterface;
 use Pkracer\JsonApiDocuments\Interfaces\ResourceInterface;
@@ -83,10 +84,29 @@ class Resource implements ResourceInterface
         return $this->meta;
     }
 
-    public function includes(Resource $resource)
+    public function includes($include)
     {
-        $this->included[] = $resource;
+        if ($include instanceof ResourceInterface) {
+            $this->included[] = $include;
+
+        }
+
+        if (is_array($include)) {
+            $this->includeArray($include);
+        }
+
         return $this;
+    }
+
+    protected function includeArray(array $includes)
+    {
+        foreach ($includes as $resource) {
+            if ( ! $resource instanceof ResourceInterface) {
+                throw new InvalidDocumentResourceException;
+            }
+
+            $this->included[] = $resource;
+        }
     }
 
     public function relationship(RelationshipInterface $relationship)
@@ -163,5 +183,10 @@ class Resource implements ResourceInterface
         }
 
         return $resource;
+    }
+
+    public function getIncludes()
+    {
+        return $this->included;
     }
 }

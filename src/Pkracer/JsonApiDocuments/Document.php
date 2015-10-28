@@ -5,17 +5,15 @@ namespace Pkracer\JsonApiDocuments;
 use Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentFormatException;
 use Pkracer\JsonApiDocuments\Exceptions\InvalidDocumentResourceException;
 use Pkracer\JsonApiDocuments\Exceptions\InvalidErrorFormatException;
-use Pkracer\JsonApiDocuments\Exceptions\InvalidLinkException;
-use Pkracer\JsonApiDocuments\Exceptions\MissingFormatException;
-use Pkracer\JsonApiDocuments\Exceptions\MissingIdException;
-use Pkracer\JsonApiDocuments\Exceptions\MissingTypeException;
-use Pkracer\JsonApiDocuments\Interfaces\DocumentFormatterInterface;
+use Pkracer\JsonApiDocuments\Interfaces\FormatterInterface;
 use Pkracer\JsonApiDocuments\Interfaces\DocumentInterface;
 use Pkracer\JsonApiDocuments\Interfaces\ErrorInterface;
 use Pkracer\JsonApiDocuments\Interfaces\ResourceInterface;
 
 class Document implements DocumentInterface
 {
+    protected $description = [];
+
     protected $data;
 
     protected $errors = [];
@@ -24,26 +22,17 @@ class Document implements DocumentInterface
 
     protected $links = [];
 
-    protected $description = [];
-
     protected $included = [];
 
-    /**
-     * @var DocumentFormatterInterface
-     */
-    protected $format;
-
-    public function __construct($format = null)
+    public function data($data, $formatter = null)
     {
-        if ($format !== null) {
-            $this->format($format);
-        }
-    }
-
-    public function data($data)
-    {
-        // clear any errors if data is being set
+        // if data is being set, clear any previously set errors
         $this->errors = [];
+
+        if ( ! is_null($formatter)) {
+            $formatter = $this->initializeFormatter($formatter);
+            $data = $formatter->format($data);
+        }
 
         if ($data instanceof ResourceInterface) {
             $this->data = $data;
@@ -60,6 +49,24 @@ class Document implements DocumentInterface
 
         $this->data = $data;
         return $this;
+    }
+
+    /**
+     * @param $formatter
+     * @return FormatterInterface
+     * @throws InvalidDocumentFormatException
+     */
+    public function initializeFormatter($formatter)
+    {
+        if (is_string($formatter) && class_exists($formatter)) {
+            $formatter = new $formatter;
+        }
+
+        if ( ! $formatter instanceof FormatterInterface) {
+            throw new InvalidDocumentFormatException;
+        }
+
+        return $formatter;
     }
 
     public function getData()
@@ -134,31 +141,8 @@ class Document implements DocumentInterface
         return $this->included;
     }
 
-    public function format($format)
-    {
-        if (is_string($format) && class_exists($format)) {
-            $format = new $format;
-        }
-
-        if ( ! $format instanceof DocumentFormatterInterface) {
-            throw new InvalidDocumentFormatException;
-        }
-
-        $this->format = $format;
-        return $this;
-    }
-
-    public function getFormat()
-    {
-        return $this->format;
-    }
-
     public function toArray()
     {
-        if ($this->format === null) {
-            throw new MissingFormatException;
-        }
-
         if ($this->errors) {
             return $this->errorDocumentToArray();
         }
